@@ -1,1 +1,182 @@
+# SnapFit Builder Design Expansion
 
+## Table of Contents
+1. [Vision & Goals](#1-vision--goals)
+2. [Personas](#2-personas)
+3. [Core Feature Areas](#3-core-feature-areas)
+4. [System Architecture](#4-system-architecture)
+5. [Data Model Highlights](#5-data-model-highlights)
+6. [Rules & Validation Engine](#6-rules--validation-engine)
+7. [Collaboration & Presence](#7-collaboration--presence)
+8. [Security & Compliance](#8-security--compliance)
+9. [Deployment & DevOps](#9-deployment--devops)
+10. [Analytics & Feedback Loops](#10-analytics--feedback-loops)
+11. [Roadmap Snapshot](#11-roadmap-snapshot)
+12. [Risks & Mitigations](#12-risks--mitigations)
+13. [Success Metrics](#13-success-metrics)
+14. [User Journeys](#14-user-journeys)
+15. [Operational KPIs & Alerts](#15-operational-kpis--alerts)
+16. [Open Questions](#16-open-questions)
+17. [Glossary](#17-glossary)
+
+## 1. Vision & Goals
+SnapFit Builder is a web application that lets hobbyists design, visualize, and order custom modular storage systems composed of interlocking panels and accessories. The expanded design focuses on lowering the barrier to entry for first-time builders while giving advanced users deep customization capabilities.
+
+Primary goals:
+- Reduce the number of steps required to go from idea to checkout for standard kits.
+- Provide real-time visual feedback while adjusting dimensions, colors, and materials.
+- Make collaboration and iteration simple through shareable projects and version history.
+- Offer a manufacturing-ready output pipeline that translates the design into cut sheets and BOMs.
+
+## 2. Personas
+1. **Starter Sam** – New to modular storage, wants templates that can be tweaked quickly.
+2. **Maker Maya** – Experienced maker who needs granular control and advanced export options.
+3. **Retailer Riley** – Small business owner coordinating designs with clients and tracking orders.
+
+## 3. Core Feature Areas
+### 3.1 Guided Project Templates
+- Library of starter layouts (e.g., wall grid, tool bench, closet organizer).
+- "Assist me" wizard that collects room dimensions, intended use, and constraints.
+- Auto-fit suggestions that adjust module counts and connector placement.
+
+### 3.2 Interactive Canvas & 3D Preview
+- Drag-and-drop modules on a snap-to-grid 2D canvas with alignment helpers.
+- Parametric controls for width, height, depth, and accessory slots.
+- WebGL-powered 3D preview with exploded view toggle for assembly guidance.
+
+### 3.3 Component Catalog & Rules Engine
+- Filterable catalog of panels, connectors, doors, and add-ons with availability indicators.
+- Rule engine that validates compatibility (e.g., connector rating vs. module load).
+- Smart substitutions when inventory is low, prompting user approval.
+
+### 3.4 Collaboration & Sharing
+- Project workspaces with role-based permissions (viewer, editor, approver).
+- Comment threads pinned to specific components or dimensions.
+- One-click snapshot sharing via public links and exportable PDFs.
+
+### 3.5 Order Fulfillment Integration
+- BOM export to manufacturing partners with SKU-level detail.
+- Pricing calculator that accounts for material, finish, and labor.
+- Order status dashboard with milestones (quote, production, shipping).
+
+## 4. System Architecture
+### 4.1 Frontend
+- Framework: React (Next.js) for SSR/ISR-enabled catalog pages and project dashboards.
+- State management: Zustand for lightweight global state; React Query for server data.
+- 3D: Three.js layered over WebGL for rendering and animations.
+- Key modules: `ProjectCanvas`, `TemplateWizard`, `CatalogSidebar`, `CollaborationBar`.
+
+### 4.2 Backend
+- Service mesh built with Node.js (NestJS) microservices communicating via gRPC.
+- Services:
+  - **Design Service** – stores project configurations, rules evaluation, versioning.
+  - **Catalog Service** – manages components, availability, pricing, supplier feeds.
+  - **Order Service** – handles checkout, payment intent creation, fulfillment updates.
+  - **Auth Service** – JWT-based authentication, SSO support, organization management.
+- API gateway exposes GraphQL for frontend consumption and REST webhooks for partners.
+
+### 4.3 Data Storage
+- PostgreSQL for relational data (users, organizations, orders, BOMs).
+- MongoDB for design states and undo/redo history snapshots.
+- Redis for session caching, presence indicators, and rate-limiting tokens.
+- S3-compatible object storage for generated renders, PDFs, and cut sheets.
+
+### 4.4 Integrations
+- Payment: Stripe for payments and invoicing.
+- CAD export: Onshape API to convert parametric data into DXF/CAD files.
+- Notifications: SendGrid (email), Slack webhooks (team notifications), Twilio (SMS updates).
+- Analytics: Segment pipeline feeding product analytics tools.
+
+## 5. Data Model Highlights
+- **Project**: id, owner_id, organization_id, template_id, metadata, current_revision.
+- **Revision**: id, project_id, snapshot_payload (JSON), change_summary, created_at.
+- **Component**: sku, name, category, dimensions, material, ruleset.
+- **Order**: id, project_id, customer_id, line_items[], total_cost, status, logistics_refs.
+
+## 6. Rules & Validation Engine
+- Constraint graphs ensure modules share compatible connector faces and load limits.
+- Dimensional tolerances validated against user-provided room measurements.
+- Scenario simulations evaluate estimated assembly time and structural stability.
+- Extensible DSL to allow product managers to author new rules without redeploying services.
+
+## 7. Collaboration & Presence
+- WebSockets (via Socket.IO) deliver real-time cursor presence, comments, and updates.
+- Live co-editing with operational transforms to merge canvas changes without conflicts.
+- Version history timeline with diff visualization between revisions.
+
+## 8. Security & Compliance
+- SOC 2 focused controls (audit logging, incident response, access reviews).
+- Field-level encryption for sensitive customer data in PostgreSQL.
+- Role-based access control with organization scoping and guest access limitations.
+- Regular penetration testing and dependency scanning pipelines.
+
+## 9. Deployment & DevOps
+- Kubernetes cluster with GitOps (ArgoCD) for environment parity.
+- Canary deployments with automated rollback using Argo Rollouts.
+- CI/CD pipeline stages: lint/test → integration tests with mocked partners → staging smoke tests → production deployment.
+- Feature flag service (LaunchDarkly) for gradual rollout of high-risk features.
+
+## 10. Analytics & Feedback Loops
+- Funnels measuring conversion from template selection to checkout.
+- Engagement metrics: time on canvas, revisions per project, collaboration sessions.
+- NPS surveys triggered post-fulfillment; qualitative insights stored in Productboard.
+
+## 11. Roadmap Snapshot
+1. **Q2** – Launch guided templates and baseline 3D preview.
+2. **Q3** – Release collaboration suite and order tracking dashboard.
+3. **Q4** – Introduce advanced rules engine authoring tools and CAD exports.
+4. **Q1 (next year)** – Offer AI-assisted layout suggestions and predictive inventory planning.
+
+## 12. Risks & Mitigations
+- **Performance bottlenecks**: Implement CDN for static assets, monitor WebGL frame rates.
+- **Inventory inaccuracies**: Cross-validate supplier feeds with manual overrides and alerts.
+- **Collaboration conflicts**: Maintain robust event sourcing and conflict resolution logic.
+- **Complex onboarding**: Provide contextual walkthroughs, embedded tutorials, and sandbox mode.
+
+## 13. Success Metrics
+- 30% decrease in time-to-order for new users by end of Q3.
+- 40% of active users leverage collaboration features within six months of launch.
+- Less than 2% design-to-manufacturing error rate measured quarterly.
+- Maintain >99.5% uptime for core design and ordering services.
+
+## 14. User Journeys
+### 14.1 Starter Sam – Template to Checkout
+1. Lands on marketing site, selects "Wall Grid Starter" template.
+2. Uses wizard to enter wall dimensions and storage goals.
+3. Adjusts canvas layout, confirming budget estimate against guidance tooltips.
+4. Invites partner as viewer to confirm layout; receives quick approval.
+5. Generates BOM, reviews Stripe-powered payment schedule, submits order.
+6. Receives automated status updates through the order dashboard and Twilio SMS.
+
+### 14.2 Maker Maya – Advanced Custom Build
+1. Starts from blank canvas within organization workspace.
+2. Imports CSV of existing components; catalog service maps SKUs and suggests compatible parts.
+3. Enables exploded 3D preview to validate assembly steps and confirm tolerances.
+4. Configures automation rule to flag when load-bearing connectors exceed limits.
+5. Exports DXF via Onshape integration for fabrication partner while locking revision for production.
+
+### 14.3 Retailer Riley – Client Collaboration Loop
+1. Duplicates baseline retail shelving project template for new client.
+2. Shares collaborative link with client for asynchronous feedback; pins comment threads on premium finishes.
+3. Uses version history to compare client-approved revision with alternate layouts.
+4. Converts approved design into staged orders aligned with phased store rollout.
+5. Monitors fulfillment milestones and triggers Slack alerts for logistics teams.
+
+## 15. Operational KPIs & Alerts
+- **Infrastructure**: Track API latency (p95 < 300ms) and WebSocket disconnect rates; trigger PagerDuty alert when thresholds exceed agreed SLOs.
+- **Data Integrity**: Daily reconciliation of inventory counts between supplier feeds and internal catalog; auto-create JIRA ticket when variance >5%.
+- **Collaboration Engagement**: Monitor weekly active collaboration sessions per organization; send lifecycle emails when usage drops week-over-week.
+- **Design Quality**: Flag projects with repeated rule violations; route to product specialists for proactive outreach.
+
+## 16. Open Questions
+- How should we price premium materials and colorways introduced post-MVP while maintaining predictable BOM outputs?
+- What level of offline support is required for field installers working in low-connectivity environments?
+- Which analytics dimensions are essential for retailers managing multiple storefront rollouts (e.g., store size, foot traffic, vertical)?
+- How will we vet third-party accessories before adding them to the component catalog to maintain quality guarantees?
+
+## 17. Glossary
+- **BOM (Bill of Materials)**: Detailed list of parts required to produce a project.
+- **DXF**: Drawing Exchange Format used to share CAD information across systems.
+- **Operational Transform**: Algorithm that reconciles concurrent edits to maintain shared document state.
+- **SKU**: Stock keeping unit identifier for catalog components.
+- **SLO (Service Level Objective)**: Target performance metric that underpins user-facing SLAs.
