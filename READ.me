@@ -1,5 +1,24 @@
 # SnapFit Builder Design Expansion
 
+## Table of Contents
+1. [Vision & Goals](#1-vision--goals)
+2. [Personas](#2-personas)
+3. [Core Feature Areas](#3-core-feature-areas)
+4. [System Architecture](#4-system-architecture)
+5. [Data Model Highlights](#5-data-model-highlights)
+6. [Rules & Validation Engine](#6-rules--validation-engine)
+7. [Collaboration & Presence](#7-collaboration--presence)
+8. [Security & Compliance](#8-security--compliance)
+9. [Deployment & DevOps](#9-deployment--devops)
+10. [Analytics & Feedback Loops](#10-analytics--feedback-loops)
+11. [Roadmap Snapshot](#11-roadmap-snapshot)
+12. [Risks & Mitigations](#12-risks--mitigations)
+13. [Success Metrics](#13-success-metrics)
+14. [User Journeys](#14-user-journeys)
+15. [Operational KPIs & Alerts](#15-operational-kpis--alerts)
+16. [Open Questions](#16-open-questions)
+17. [Glossary](#17-glossary)
+
 ## 1. Vision & Goals
 SnapFit Builder is a web application that lets hobbyists design, visualize, and order custom modular storage systems composed of interlocking panels and accessories. The expanded design focuses on lowering the barrier to entry for first-time builders while giving advanced users deep customization capabilities.
 
@@ -119,3 +138,45 @@ Primary goals:
 - 40% of active users leverage collaboration features within six months of launch.
 - Less than 2% design-to-manufacturing error rate measured quarterly.
 - Maintain >99.5% uptime for core design and ordering services.
+
+## 14. User Journeys
+### 14.1 Starter Sam – Template to Checkout
+1. Lands on marketing site, selects "Wall Grid Starter" template.
+2. Uses wizard to enter wall dimensions and storage goals.
+3. Adjusts canvas layout, confirming budget estimate against guidance tooltips.
+4. Invites partner as viewer to confirm layout; receives quick approval.
+5. Generates BOM, reviews Stripe-powered payment schedule, submits order.
+6. Receives automated status updates through the order dashboard and Twilio SMS.
+
+### 14.2 Maker Maya – Advanced Custom Build
+1. Starts from blank canvas within organization workspace.
+2. Imports CSV of existing components; catalog service maps SKUs and suggests compatible parts.
+3. Enables exploded 3D preview to validate assembly steps and confirm tolerances.
+4. Configures automation rule to flag when load-bearing connectors exceed limits.
+5. Exports DXF via Onshape integration for fabrication partner while locking revision for production.
+
+### 14.3 Retailer Riley – Client Collaboration Loop
+1. Duplicates baseline retail shelving project template for new client.
+2. Shares collaborative link with client for asynchronous feedback; pins comment threads on premium finishes.
+3. Uses version history to compare client-approved revision with alternate layouts.
+4. Converts approved design into staged orders aligned with phased store rollout.
+5. Monitors fulfillment milestones and triggers Slack alerts for logistics teams.
+
+## 15. Operational KPIs & Alerts
+- **Infrastructure**: Track API latency (p95 < 300ms) and WebSocket disconnect rates; trigger PagerDuty alert when thresholds exceed agreed SLOs.
+- **Data Integrity**: Daily reconciliation of inventory counts between supplier feeds and internal catalog; auto-create JIRA ticket when variance >5%.
+- **Collaboration Engagement**: Monitor weekly active collaboration sessions per organization; send lifecycle emails when usage drops week-over-week.
+- **Design Quality**: Flag projects with repeated rule violations; route to product specialists for proactive outreach.
+
+## 16. Open Questions
+- How should we price premium materials and colorways introduced post-MVP while maintaining predictable BOM outputs?
+- What level of offline support is required for field installers working in low-connectivity environments?
+- Which analytics dimensions are essential for retailers managing multiple storefront rollouts (e.g., store size, foot traffic, vertical)?
+- How will we vet third-party accessories before adding them to the component catalog to maintain quality guarantees?
+
+## 17. Glossary
+- **BOM (Bill of Materials)**: Detailed list of parts required to produce a project.
+- **DXF**: Drawing Exchange Format used to share CAD information across systems.
+- **Operational Transform**: Algorithm that reconciles concurrent edits to maintain shared document state.
+- **SKU**: Stock keeping unit identifier for catalog components.
+- **SLO (Service Level Objective)**: Target performance metric that underpins user-facing SLAs.
